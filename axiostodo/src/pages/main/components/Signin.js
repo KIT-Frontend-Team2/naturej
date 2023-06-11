@@ -4,6 +4,7 @@ import BasicButton from "@components/Button/Button";
 import { toastMessage } from "@components/Toast/toast-message";
 import useInputs from "@hooks/use-inputs";
 import * as S from "./style";
+import axios from "axios";
 
 const SignInForm = () => {
   const [{ email }, onChangeForm, errors] = useInputs({
@@ -19,13 +20,14 @@ const SignInForm = () => {
 
   const onSubmitSignin = async (e) => {
     e.preventDefault();
-    const { password } = e.target;
-    if (email === "" || password.value === "")
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+    if (email === "" || password === "")
       return toastMessage("이메일 비밀번호를 입력해주세요", toast.error);
     setIsValid(false);
     setCursor("wait");
     try {
-      await toast.promise(signInRequest, {
+      await toast.promise(signInRequest(email, password), {
         pending: {
           render() {
             return "처리 중 ...";
@@ -40,23 +42,24 @@ const SignInForm = () => {
           ...toastOption,
         },
         error: {
-          render() {
-            return "로그인 실패. 잠시 후 다시 시도해 주세요.";
+          render(data) {
+            return `${data.data.response.data.error}`;
           },
           icon: "😢",
           ...toastOption,
         },
       });
-      setIsValid(true);
-      setCursor("pointer");
     } catch (error) {
       toastMessage(error, toast.error);
+    } finally {
+      setIsValid(true);
+      setCursor("pointer");
     }
   };
 
-  // 로그인 요청(Back-end 통신)을 가정
-  const signInRequest = () => {
-    return new Promise((resolve) => setTimeout(resolve, 2000));
+  // 로그인 요청(Back-end 통신)
+  const signInRequest = (email, password) => {
+    return axios.post("http://localhost:9000/user/login", { email, password });
   };
 
   return (

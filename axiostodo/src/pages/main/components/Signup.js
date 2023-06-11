@@ -4,6 +4,7 @@ import BasicButton from "@components/Button/Button";
 import { toastMessage } from "@components/Toast/toast-message";
 import useInputs from "@hooks/use-inputs";
 import * as S from "./style";
+import axios from "axios";
 
 const SignUpForm = () => {
   const [
@@ -55,23 +56,27 @@ const SignUpForm = () => {
           ...toastOption,
         },
         error: {
-          render() {
-            return "회원가입 실패. 잠시 후 다시 시도해 주세요.";
+          render(data) {
+            return `${data.data.response.data.error}`;
           },
           icon: "😢",
           ...toastOption,
         },
       });
-      setIsValid(true);
-      setCursor("pointer");
     } catch (error) {
       toastMessage(error, toast.error);
+    } finally {
+      setIsValid(true);
+      setCursor("pointer");
     }
   };
 
-  // 회원가입 요청(Back-end 통신)을 가정
+  // 회원가입 요청(Back-end 통신)
   const signUpRequest = () => {
-    return new Promise((resolve) => setTimeout(resolve, 2000));
+    return axios.post("http://localhost:9000/user/sign", {
+      email,
+      password,
+    });
   };
 
   return (
