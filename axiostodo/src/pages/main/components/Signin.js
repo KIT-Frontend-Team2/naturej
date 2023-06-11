@@ -4,8 +4,8 @@ import BasicButton from "@components/Button/Button";
 import { toastMessage } from "@components/Toast/toast-message";
 import useInputs from "@hooks/use-inputs";
 import * as S from "./style";
-import axios from "axios";
 import AuthApi from "apis/auth.api";
+import TokenRepository from "repositories/TokenRepository";
 
 const SignInForm = () => {
   const [{ email }, onChangeForm, errors] = useInputs({
@@ -50,7 +50,7 @@ const SignInForm = () => {
           ...toastOption,
         },
       });
-      localStorage.setItem("accessToken", res.data.data.token);
+      TokenRepository.setToken(res.data.data.token);
     } catch (error) {
       toastMessage(error, toast.error);
     } finally {
