@@ -6,6 +6,8 @@ import useInputs from "@hooks/use-inputs";
 import * as S from "./style";
 import AuthApi from "apis/auth.api";
 import TokenRepository from "repositories/TokenRepository";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "contexts/auth.ctx";
 
 const SignInForm = () => {
   const [{ email }, onChangeForm, errors] = useInputs({
@@ -13,6 +15,9 @@ const SignInForm = () => {
   });
   const [isValid, setIsValid] = useState(true);
   const [cursor, setCursor] = useState("pointer");
+  const navigation = useNavigate();
+
+  const auth = useAuth();
 
   const toastOption = {
     autoClose: 2000,
@@ -50,7 +55,8 @@ const SignInForm = () => {
           ...toastOption,
         },
       });
-      TokenRepository.setToken(res.data.data.token);
+      auth.login(res.data.data.token);
+      navigation("/todo/3");
     } catch (error) {
       toastMessage(error, toast.error);
     } finally {
