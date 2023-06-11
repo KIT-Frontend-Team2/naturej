@@ -1,62 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import BasicButton from "@components/Button/Button";
 import { flexAlignCenter, flexCenter } from "@styles/common";
 import TodoAddModal from "./components/Modal/add-modal";
 import TodoList from "./components/List/todo-list";
+import { axiosInstance } from "utils/axios";
 
 const TodoPage = () => {
   // 모달창 띄울건지 관리하는 state 변수
   const [isAddTodoModal, setIsAddTodoModal] = useState(false);
-  const [todoList, setTodoList] = useState([
-    {
-      id: 1,
-      title: "example1",
-      content: "content1",
-      state: false,
-    },
-    {
-      id: 2,
-      title: "example2",
-      content: "content2",
-      state: false,
-    },
-    {
-      id: 3,
-      title: "example3",
-      content: "content3",
-      state: false,
-    },
-  ]);
+  const [todoList, setTodoList] = useState([]);
 
+  // 조회
+  const getTodoList = async () => {
+    const getTodo = await axiosInstance.get("/todo");
+    setTodoList(getTodo.data.data);
+  };
+
+  useEffect(() => {
+    getTodoList();
+  }, []);
+
+  // 추가
   const addTodo = (title, content) => {
-    return new Promise((resolve) =>
-      setTimeout(() => {
-        const newTodo = {
-          id: Math.floor(Math.random() * 100000),
-          state: false,
-          title,
-          content,
-        };
-        resolve(newTodo);
-      }, 1000)
-    ).then((todo) => {
-      setTodoList([todo, ...todoList]);
-      setIsAddTodoModal(false);
+    return axiosInstance.post("/todo", {
+      title,
+      content,
     });
   };
 
-  const showTodoToastMessage = (e) => {
+  const showTodoToastMessage = async (e) => {
     e.preventDefault();
     const title = e.target.title.value;
     const content = e.target.content.value;
 
-    toast.promise(addTodo(title, content), {
-      pending: "TODO LOADING",
-      success: "TODO SUCCESS",
-      error: "TODO ERROR",
-    });
+    if (!title || !content) {
+      return alert("빈칸을 채워주세요");
+    }
+
+    try {
+      await toast.promise(addTodo(title, content), {
+        pending: "TODO LOADING",
+        success: "TODO SUCCESS",
+        error: "TODO ERROR",
+      });
+      getTodoList();
+      setIsAddTodoModal(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handelOpenTodoModal = () => {

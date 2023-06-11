@@ -1,20 +1,28 @@
 import OneTodo from "./one-todo";
+import { axiosInstance } from "utils/axios";
 
 const TodoList = ({ todoList, setTodoList }) => {
   // 수정
-  const updateTodo = (id, title, content) => {
-    const _todoList = [...todoList];
-    const todo = _todoList.find((todo) => todo.id === id);
-    todo.title = title;
-    todo.content = content;
-    setTodoList(_todoList);
+  const updateTodo = async (id, title, content, state) => {
+    try {
+      await axiosInstance.put(`/todo/${id}`, { content, state });
+      const getTodo = await axiosInstance.get("/todo");
+      setTodoList(getTodo.data.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   // 삭제
-  const deleteTodo = (id) => {
+  const deleteTodo = async (id) => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
-      const _todoList = todoList.filter((todo) => todo.id !== id);
-      setTodoList(_todoList);
+      try {
+        await axiosInstance.delete(`/todo/${id}`);
+        const getTodo = await axiosInstance.get("/todo");
+        setTodoList(getTodo.data.data);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
