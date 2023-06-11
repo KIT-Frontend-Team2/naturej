@@ -27,7 +27,7 @@ const SignInForm = () => {
     setIsValid(false);
     setCursor("wait");
     try {
-      await toast.promise(signInRequest(email, password), {
+      const res = await toast.promise(signInRequest(email, password), {
         pending: {
           render() {
             return "처리 중 ...";
@@ -49,6 +49,7 @@ const SignInForm = () => {
           ...toastOption,
         },
       });
+      localStorage.setItem("accessToken", res.data.data.token);
     } catch (error) {
       toastMessage(error, toast.error);
     } finally {
@@ -59,7 +60,11 @@ const SignInForm = () => {
 
   // 로그인 요청(Back-end 통신)
   const signInRequest = (email, password) => {
-    return axios.post("http://localhost:9000/user/login", { email, password });
+    return axios.post(
+      "http://localhost:9000/user/login",
+      { email, password },
+      { withCredentials: true }
+    );
   };
 
   return (
