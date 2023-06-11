@@ -5,7 +5,7 @@ import BasicButton from "@components/Button/Button";
 import { flexAlignCenter, flexCenter } from "@styles/common";
 import TodoAddModal from "./components/Modal/add-modal";
 import TodoList from "./components/List/todo-list";
-import { axiosInstance } from "utils/axios";
+import TodoApi from "apis/todo.api";
 
 const TodoPage = () => {
   // 모달창 띄울건지 관리하는 state 변수
@@ -14,7 +14,7 @@ const TodoPage = () => {
 
   // 조회
   const getTodoList = async () => {
-    const getTodo = await axiosInstance.get("/todo");
+    const getTodo = await TodoApi.getTodo();
     setTodoList(getTodo.data.data);
   };
 
@@ -24,10 +24,7 @@ const TodoPage = () => {
 
   // 추가
   const addTodo = (title, content) => {
-    return axiosInstance.post("/todo", {
-      title,
-      content,
-    });
+    return TodoApi.addTodo(title, content);
   };
 
   const showTodoToastMessage = async (e) => {

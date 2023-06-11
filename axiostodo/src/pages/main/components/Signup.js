@@ -5,6 +5,7 @@ import { toastMessage } from "@components/Toast/toast-message";
 import useInputs from "@hooks/use-inputs";
 import * as S from "./style";
 import axios from "axios";
+import AuthApi from "apis/auth.api";
 
 const SignUpForm = () => {
   const [
@@ -73,10 +74,7 @@ const SignUpForm = () => {
 
   // 회원가입 요청(Back-end 통신)
   const signUpRequest = () => {
-    return axios.post("http://localhost:9000/user/sign", {
-      email,
-      password,
-    });
+    return AuthApi.signUp(email, password);
   };
 
   return (
