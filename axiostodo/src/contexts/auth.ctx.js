@@ -24,7 +24,7 @@ const AuthProvider = ({ children }) => {
   // 로그아웃 API & 토큰 비우기
   const logout = async () => {
     const res = await AuthApi.logout();
-    if (res === 201) {
+    if (res.status === 201) {
       TokenRepository.removeToken();
       setAccessToken(null);
     }
