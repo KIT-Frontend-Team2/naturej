@@ -6,14 +6,17 @@ import GlobalStyles from "./styles/global";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AuthProvider from "contexts/auth.ctx";
+import TodoProvider from "contexts/todo.ctx";
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
-        <GlobalStyles />
-        <RouterProvider router={router} />
-        <ToastContainer {...toastOption} />
+        <TodoProvider>
+          <GlobalStyles />
+          <RouterProvider router={router} />
+          <ToastContainer {...toastOption} />
+        </TodoProvider>
       </AuthProvider>
     </ThemeProvider>
   );

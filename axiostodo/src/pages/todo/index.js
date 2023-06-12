@@ -1,53 +1,22 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { toast } from "react-toastify";
 import BasicButton from "@components/Button/Button";
 import { flexAlignCenter, flexCenter } from "@styles/common";
 import TodoAddModal from "./components/Modal/add-modal";
 import TodoList from "./components/List/todo-list";
-import TodoApi from "apis/todo.api";
+import { useTodo } from "contexts/todo.ctx";
 
 const TodoPage = () => {
   // 모달창 띄울건지 관리하는 state 변수
   const [isAddTodoModal, setIsAddTodoModal] = useState(false);
-  const [todoList, setTodoList] = useState([]);
 
-  // 조회
-  const getTodoList = async () => {
-    const getTodo = await TodoApi.getTodo();
-    setTodoList(getTodo.data.data);
-  };
+  const { getTodoList } = useTodo();
 
+  // useContext의 useEffect가 실행되는 시점 : 앱이 실행될 때
+  // 내가 원하는 페이지에 있을 때 todoList를 불러올 수 있도록 todo page에 설정
   useEffect(() => {
     getTodoList();
   }, []);
-
-  // 추가
-  const addTodo = (title, content) => {
-    return TodoApi.addTodo(title, content);
-  };
-
-  const showTodoToastMessage = async (e) => {
-    e.preventDefault();
-    const title = e.target.title.value;
-    const content = e.target.content.value;
-
-    if (!title || !content) {
-      return alert("빈칸을 채워주세요");
-    }
-
-    try {
-      await toast.promise(addTodo(title, content), {
-        pending: "TODO LOADING",
-        success: "TODO SUCCESS",
-        error: "TODO ERROR",
-      });
-      getTodoList();
-      setIsAddTodoModal(false);
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handelOpenTodoModal = () => {
     setIsAddTodoModal(true);
@@ -59,17 +28,12 @@ const TodoPage = () => {
 
   return (
     <>
-      {isAddTodoModal && (
-        <TodoAddModal
-          onAddToDo={showTodoToastMessage}
-          onClose={handelCloseTodoModal}
-        />
-      )}
+      {isAddTodoModal && <TodoAddModal onClose={handelCloseTodoModal} />}
       <S.Wrapper>
         <S.Container>
           <S.Title>List</S.Title>
           <S.Content>
-            <TodoList todoList={todoList} setTodoList={setTodoList} />
+            <TodoList />
           </S.Content>
           <S.ButtonBox>
             <BasicButton

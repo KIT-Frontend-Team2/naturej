@@ -1,10 +1,35 @@
 import styled from "styled-components";
 import { flexAlignCenter, flexCenter, modalBackGround } from "@styles/common";
+import { toast } from "react-toastify";
+import { useTodo } from "contexts/todo.ctx";
 
-const TodoAddModal = ({ onAddToDo, onClose }) => {
+const TodoAddModal = ({ onClose }) => {
+  const { addTodo } = useTodo();
+
+  const showTodoToastMessage = async (e) => {
+    e.preventDefault();
+    const title = e.target.title.value;
+    const content = e.target.content.value;
+
+    if (!title || !content) {
+      return alert("빈칸을 채워주세요");
+    }
+
+    try {
+      await toast.promise(addTodo(title, content), {
+        pending: "TODO LOADING",
+        success: "TODO SUCCESS",
+        error: "TODO ERROR",
+      });
+      onClose();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <S.Wrapper>
-      <S.Form onSubmit={onAddToDo}>
+      <S.Form onSubmit={showTodoToastMessage}>
         <S.Title>
           <span>ADD TODO LIST</span>
           <button type="button" onClick={onClose}>

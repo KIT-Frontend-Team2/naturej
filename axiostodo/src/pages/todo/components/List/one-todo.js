@@ -4,19 +4,22 @@ import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faPen, faBan } from "@fortawesome/free-solid-svg-icons";
 import { flexAlignCenter, flexCenter } from "@styles/common";
+import { useTodo } from "contexts/todo.ctx";
 
-const OneTodo = ({ todo, updateTodo, deleteTodo, completeTodo }) => {
+const OneTodo = ({ todo }) => {
   const { id, state, title, content } = todo;
   const [isEditMode, setIsEditMode] = useState(false);
 
   const { register } = useForm();
+
+  const { updateTodo, deleteTodo } = useTodo();
 
   const handleTodoEdit = (e) => {
     e.preventDefault();
     if (!isEditMode) return setIsEditMode(true);
     const editTitle = e.target.title.value;
     const editContent = e.target.content.value;
-    updateTodo(id, editTitle, editContent);
+    updateTodo(id, editContent, state);
     setIsEditMode(false);
   };
 
@@ -25,7 +28,7 @@ const OneTodo = ({ todo, updateTodo, deleteTodo, completeTodo }) => {
   };
 
   const handleTodoComplete = () => {
-    completeTodo(id, state);
+    updateTodo(id, content, !state);
   };
 
   return (
