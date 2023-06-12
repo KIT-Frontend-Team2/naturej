@@ -3,6 +3,7 @@ import MainPage from "@pages/main";
 import TodoPage from "@pages/todo";
 import Layout from "@components/Layout";
 import ReactHookForm from "@pages/reactHookForm";
+import PrivateRoute from "./private";
 
 const router = createBrowserRouter(
   [
@@ -18,8 +19,13 @@ const router = createBrowserRouter(
           element: <ReactHookForm />,
         },
         {
-          path: "/todo/:todoId",
-          element: <TodoPage />,
+          element: <PrivateRoute />,
+          children: [
+            {
+              path: "/todo/:todoId",
+              element: <TodoPage />,
+            },
+          ],
         },
       ],
     },
