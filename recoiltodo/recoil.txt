@@ -1,0 +1,78 @@
+recoil, react-query
+  recoil : 전역 상태 관리 도구
+  react-query : 백엔드의 데이터를 상태로서 관리하게 해주고 데이터를 캐싱하여 불필요한 통신을 일으키지 않는 미들웨어
+
+* recoil
+
+  redux -> react에서 만든 상태 관리 라이브러리가 아님
+  recoil은 2020년 5월 facebook에서 고안하여 hooks 함수를 기반으로 하여 제작된 react 전용 상태 관리 라이브러리
+  redux 역시 facebook에서 고안한 flux 패턴을 기반으로 설계되었고 충분히 훌륭한 전역 상태 관리 라이브러리지만
+
+  문제점
+    1. react 전용 관리 라이브러리 아님 -> 안정성 및 호환성 감소
+    2. 복잡한 초기 셋팅과 보일러 코드가 존재
+    3. 비동기 데이터를 통신하기 위해 추가적으로 미들웨어를 설치 (thunk, saga)
+
+  recoil은 사용하고자 하는 atom들을 컴포넌트들이 구독하면서 상태 관리가 가능
+  ex)
+    const [state, setState] = useRecoilState(아톰명)
+
+    const state = useRecoilValue(아톰명)
+    const setState = useSetRecoilState(아톰명)
+
+    const reset = useResetRecoilState(아톰명)
+
+  * selector (이제는 잘 사용하지 않는 개념)
+    react-query를 사용하지 않는다면 굉장히 유용, 그러나 react query로 서버에서 받아온 데이터(비동기)를
+    자동 전역상태관리 해주는데 왜 필요하나?
+
+    const postListSelector = selector({
+      key: "postList",
+      get: async(get => ({
+          const id = get(focusAtom).id
+          const allPost = get(postListAtom)
+
+        1.
+          // 기존 아톰을 변형하여 새로운 전역 상태 관리를 위한 아톰을 생성
+          const post = allPost.find(...)
+
+        2. 
+          // useEffect를 쓰지 않고, atom을 생성하지 않아도
+          // 백엔드에서 받아온 데이터를 새로운 아톰으로 생성해주는 메서드
+          const post = await PostApi.getAllPost();
+
+        return post
+      }))
+    })
+
+---------------------------------------------------------------------------------------------
+
+* react-query(tanstack/query)
+  서버 데이터의 전역 상태 관리, 미들웨어, 데이터 패칭 라이브러리
+
+  * 
+    staleTime
+    - (신선하지 않은 신간) -> 유효기간 지났다 -> 최신화가 필요하다.
+    - react-query server에 받아온 데이터를 캐싱하고 있기 때문에 서버에 데이터가 변했을 수도 있기 때문에 유효 기가능ㄹ 상정하여
+    - 해당 유효기간이 지나면 데이터를 새로 받을 수 있도록, ui의 변동 있음 (상태로써 관리)
+
+    cacheTime
+    - 저장하고 있는 시간
+    - 서버에서 받아온 데이터는 캐시타임으로 정해진 시간 동안만 데이터가 저장되어 있음
+    - 만약 캐시타임이 지나거나 0이 되면 데이터를 새로 받아옴, ui를 업데이트하지 않음
+
+    staleTime을 4분 정도로 설정하면 cacheTime 5분 설정
+
+    option: {
+      refetch
+      // 내가 원하는 시점에 지정한 api를 다시 호출할 수 있는 함수, 단 같은 컴포넌트 내에서만 사용
+      retry
+      // 테이터 패칭 실패 시 재시도 옵션
+      useQueryClient : react-query의 context로, 내가 지정한 query를 신선하지 않은 상태로 바꿔줄 수 있음
+      // 개발자가 원할 때 새로운 데이터를 받아올 수 있다는 얘기
+      // staleTime과 무환하게, 개발자가 의도하는 대로 데이터를 캐싱하고, 캐싱하지 않을 수 있다는 이야기
+      // 캐싱이 되었을 때 장점은 백엔드와 현재 프론트엔드 데이터가 일치하다면 재요청할 필요가 없음
+    }
+
+---------------------------------------------------------------------------------------------
+
