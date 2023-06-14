@@ -3,6 +3,9 @@ import OneTodo from "./one-todo";
 
 const TodoList = () => {
   const todoList = useSelector((state) => state.todo.todos);
+  const { loading } = useSelector((state) => state.todo.addTodoState);
+
+  if (loading) return <div>로딩중</div>;
 
   return (
     <>
